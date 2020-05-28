@@ -1,11 +1,12 @@
-package br.com.pagseguro.androidrx;
+package dev.amaro.androidrx;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.Arrays;
 import java.util.List;
@@ -14,10 +15,7 @@ import java.util.concurrent.TimeUnit;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.annotations.NonNull;
-import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
-import io.reactivex.functions.Predicate;
 import io.reactivex.subjects.PublishSubject;
 
 public class MainActivity extends AppCompatActivity {
@@ -51,28 +49,21 @@ public class MainActivity extends AppCompatActivity {
         });
 
         publisher
-                .filter(new Predicate<String>() {
-                    @Override
-                    public boolean test(@NonNull String s) throws Exception {
-                        return s != null && s.length() > 1;
-                    }
+                .doOnNext(it -> System.out.println(it))
+                .throttleLast(100, TimeUnit.MILLISECONDS) // http://reactivex.io/RxJava/javadoc/io/reactivex/Observable.html#throttleLast-long-java.util.concurrent.TimeUnit-
+                .debounce(300, TimeUnit.MILLISECONDS) // http://reactivex.io/RxJava/javadoc/io/reactivex/Observable.html#debounce-io.reactivex.functions.Function-
+                .filter(s -> s != null && s.length() > 1)
+                .doOnNext(s -> System.out.println(s))
+                .flatMap((Function<String, ObservableSource<String>>) s -> {
+                    sb = new StringBuilder();
+                    return search(s.toLowerCase());
                 })
-                .throttleLast(100, TimeUnit.MILLISECONDS)
-                .debounce(300, TimeUnit.MILLISECONDS)
-                .flatMap(new Function<String, ObservableSource<String>>() {
-                    @Override
-                    public ObservableSource<String> apply(@NonNull String s) throws Exception {
-                        sb = new StringBuilder();
-                        return search(s);
-                    }
-                })
+                .doOnNext(s -> System.out.println(s))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<String>() {
-                    @Override
-                    public void accept(@NonNull String s) throws Exception {
-                        sb.append(s).append(", ");
-                        results.setText(sb);
-                    }
+                .subscribe(s -> {
+                    sb.append(s).append(", ");
+                    System.out.println(sb);
+                    results.setText(sb);
                 });
     }
 
@@ -80,11 +71,6 @@ public class MainActivity extends AppCompatActivity {
         List<String> countries = Arrays.asList("Argentina", "Bolívia", "Brasil", "Chile", "Colômbia", "Equador", "Guiana",
                 "Guiana Francesa", "Paraguai", "Peru", "Suriname", "Venezuela", "Uruguai");
         return Observable.fromIterable(countries)
-                .filter(new Predicate<String>() {
-                    @Override
-                    public boolean test(@NonNull String s) throws Exception {
-                        return s.toLowerCase().startsWith(query);
-                    }
-                });
+                .filter(s -> s.toLowerCase().startsWith(query));
     }
 }

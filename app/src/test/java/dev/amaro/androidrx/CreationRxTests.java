@@ -1,4 +1,4 @@
-package br.com.pagseguro.androidrx;
+package dev.amaro.androidrx;
 
 import org.junit.Test;
 
@@ -13,14 +13,11 @@ import io.reactivex.functions.Consumer;
 public class CreationRxTests {
     @Test
     public void observableCreateMethod() throws Exception {
-        Observable<Integer> observable = Observable.create(new ObservableOnSubscribe<Integer>() {
-            @Override
-            public void subscribe(@NonNull ObservableEmitter<Integer> e) throws Exception {
-                e.onNext(1);
-                e.onNext(2);
-                e.onNext(4);
-                e.onComplete();
-            }
+        Observable<Integer> observable = Observable.create(e -> {
+            e.onNext(1);
+            e.onNext(2);
+            e.onNext(4);
+            e.onComplete();
         });
         observable.subscribe(printEmitted());
     }
@@ -43,13 +40,7 @@ public class CreationRxTests {
         observable.subscribe(printEmitted());
     }
 
-    @android.support.annotation.NonNull
     public static <T> Consumer<T> printEmitted() {
-        return new Consumer<T>() {
-            @Override
-            public void accept(@NonNull T integer) throws Exception {
-                System.out.println(integer);
-            }
-        };
+        return System.out::println;
     }
 }

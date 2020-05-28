@@ -1,4 +1,4 @@
-package br.com.pagseguro.androidrx;
+package dev.amaro.androidrx;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("br.com.pagseguro.androidrx", appContext.getPackageName());
+        assertEquals("dev.amaro.androidrx", appContext.getPackageName());
     }
 }

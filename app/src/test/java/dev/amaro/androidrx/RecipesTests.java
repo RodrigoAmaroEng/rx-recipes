@@ -1,4 +1,4 @@
-package br.com.pagseguro.androidrx;
+package dev.amaro.androidrx;
 
 import org.junit.Test;
 
@@ -34,13 +34,9 @@ public class RecipesTests {
         RestApi instance = RestAdapter.instance();
         Observable<AccountVO> call1 = instance.getAccountInfo("1");
         Observable<BankVO> call2 = instance.getBankInfo("1");
-        // Zip só funciona pois apenas um objeto é retornado por cada chamada
-        TestObserver<Object> test = Observable.zip(call1, call2, new BiFunction<AccountVO, BankVO, Object>() {
-            @Override
-            public Object apply(@NonNull AccountVO accountVO, @NonNull BankVO bankVO) throws Exception {
-                return new Object(); // Montado a partir das informações de ambos
-            }
-        }).subscribeOn(Schedulers.newThread())
+        // http://reactivex.io/RxJava/javadoc/io/reactivex/Observable.html#zip-java.lang.Iterable-io.reactivex.functions.Function-
+        TestObserver<Object> test = Observable.zip(call1, call2, (accountVO, bankVO) -> new Object())
+                .subscribeOn(Schedulers.newThread())
                 .test();
         test.awaitTerminalEvent();
         test.assertValueCount(1);
@@ -51,14 +47,10 @@ public class RecipesTests {
         RestApi instance = RestAdapter.instance();
         Observable<AccountVO> call1 = instance.getAccountInfo("1");
         Observable<BankVO> call2 = instance.getBankInfo("1");
-        // Zip só funciona pois apenas um objeto é retornado por cada chamada
+        // http://reactivex.io/RxJava/javadoc/io/reactivex/Observable.html#zipWith-java.lang.Iterable-io.reactivex.functions.BiFunction-
         TestObserver<Object> test = instance.getAccountInfo("1")
-                .zipWith(call2, new BiFunction<AccountVO, BankVO, Object>() {
-                    @Override
-                    public Object apply(@NonNull AccountVO accountVO, @NonNull BankVO bankVO) throws Exception {
-                        return new Object(); // Montado a partir das informações de ambos
-                    }
-                }).subscribeOn(Schedulers.newThread())
+                .zipWith(call2, (accountVO, bankVO) -> new Object())
+                .subscribeOn(Schedulers.newThread())
                 .test();
         test.awaitTerminalEvent();
         test.assertValueCount(1);

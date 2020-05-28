@@ -1,4 +1,4 @@
-package br.com.pagseguro.androidrx;
+package dev.amaro.androidrx;
 
 
 import io.reactivex.Observable;
