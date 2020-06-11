@@ -25,9 +25,11 @@ public class TransformingRxTests {
     public void observableFlatMapFunction() throws Exception {
         Observable<List<Integer>> range = Observable.just(Arrays.asList(1, 2, 3, 4, 5));
         // http://reactivex.io/RxJava/javadoc/io/reactivex/Observable.html#flatMap-io.reactivex.functions.Function-
-        range.flatMap((Function<List<Integer>, ObservableSource<Integer>>) integers -> {
-            System.out.println("Event: " + integers.size());
-            return Observable.fromIterable(integers);
-        }).subscribe(printEmitted());
+        range
+                .doOnNext(it -> System.out.println(it))
+                .flatMap((Function<List<Integer>, ObservableSource<Integer>>) integers -> {
+                    System.out.println("Event: " + integers.size());
+                    return Observable.fromIterable(integers);
+                }).subscribe(printEmitted());
     }
 }

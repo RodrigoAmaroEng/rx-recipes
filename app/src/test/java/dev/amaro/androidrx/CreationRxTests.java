@@ -19,7 +19,21 @@ public class CreationRxTests {
             e.onNext(4);
             e.onComplete();
         });
-        observable.subscribe(printEmitted());
+        observable
+                .doOnComplete(() -> System.out.println("Completed"))
+                .subscribe(printEmitted());
+    }
+
+    @Test
+    public void observableCreateMethodNoComplete() throws Exception {
+        Observable<Integer> observable = Observable.create(e -> {
+            e.onNext(1);
+            e.onNext(2);
+            e.onNext(4);
+        });
+        observable
+                .doOnComplete(() -> System.out.println("Completed"))
+                .subscribe(printEmitted());
     }
 
     @Test
@@ -30,7 +44,7 @@ public class CreationRxTests {
 
     @Test
     public void observableFromMethod() throws Exception {
-        Observable<String> observable = Observable.fromIterable(Arrays.asList("T1", "T2"));
+        Observable<String> observable = Observable.fromIterable(Arrays.asList("T1", "T2", "T3"));
         observable.subscribe(printEmitted());
     }
 

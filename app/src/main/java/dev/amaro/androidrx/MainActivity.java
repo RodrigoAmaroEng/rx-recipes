@@ -49,27 +49,23 @@ public class MainActivity extends AppCompatActivity {
         });
 
         publisher
-                .doOnNext(it -> System.out.println(it))
                 .throttleLast(100, TimeUnit.MILLISECONDS) // http://reactivex.io/RxJava/javadoc/io/reactivex/Observable.html#throttleLast-long-java.util.concurrent.TimeUnit-
                 .debounce(300, TimeUnit.MILLISECONDS) // http://reactivex.io/RxJava/javadoc/io/reactivex/Observable.html#debounce-io.reactivex.functions.Function-
                 .filter(s -> s != null && s.length() > 1)
-                .doOnNext(s -> System.out.println(s))
                 .flatMap((Function<String, ObservableSource<String>>) s -> {
                     sb = new StringBuilder();
                     return search(s.toLowerCase());
                 })
-                .doOnNext(s -> System.out.println(s))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(s -> {
                     sb.append(s).append(", ");
-                    System.out.println(sb);
                     results.setText(sb);
                 });
     }
 
     private ObservableSource<String> search(final String query) {
-        List<String> countries = Arrays.asList("Argentina", "Bolívia", "Brasil", "Chile", "Colômbia", "Equador", "Guiana",
-                "Guiana Francesa", "Paraguai", "Peru", "Suriname", "Venezuela", "Uruguai");
+        List<String> countries = Arrays.asList("Argentina", "Bolívia", "Brasil", "Chile", "Colômbia", "Equador", "Guatemala", "Guiana",
+                "Guiana Francesa", "México", "Paraguai", "Peru", "Suriname", "Venezuela", "Uruguai");
         return Observable.fromIterable(countries)
                 .filter(s -> s.toLowerCase().startsWith(query));
     }

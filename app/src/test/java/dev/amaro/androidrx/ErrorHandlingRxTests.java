@@ -55,4 +55,6 @@ public class ErrorHandlingRxTests {
         // http://reactivex.io/RxJava/javadoc/io/reactivex/Observable.html#retry--
         observable.retry().subscribe(printEmitted());
     }
+
+
 }
